@@ -68,9 +68,9 @@
             :size (or (value +SIZE+ :range NIL)
                       (value +SIZE+ :double NIL))
             :spacing (maybe-enum-val 'spacing (value +SPACING+ :int 0))
-            :width (maybe-enum-val 'width (value +WIDTH+ :int 100))))))
+            :stretch (maybe-enum-val 'stretch (value +WIDTH+ :int 100))))))
 
-(defun init-pattern (pattern &key family slant weight size spacing width)
+(defun init-pattern (pattern &key family slant weight size spacing stretch)
   (when family
     (pattern-add-string pattern +FAMILY+ family))
   (when slant
@@ -79,8 +79,8 @@
     (pattern-add-integer pattern +WEIGHT+ (maybe-enum 'weight weight)))
   (when spacing
     (pattern-add-integer pattern +SPACING+ (maybe-enum 'spacing spacing)))
-  (when width
-    (pattern-add-integer pattern +WIDTH+ (maybe-enum 'width width)))
+  (when stretch
+    (pattern-add-integer pattern +WIDTH+ (maybe-enum 'stretch stretch)))
   (when size
     (destructuring-bind (start end) (if (listp size) size (list size size))
       (let ((range (create-range (float start 0d0) (float end 0d0))))
@@ -90,8 +90,8 @@
   (default-substitute pattern)
   pattern)
 
-(defun find-font (&rest args &key family slant weight size spacing width)
-  (declare (ignore family slant weight size spacing width))
+(defun find-font (&rest args &key family slant weight size spacing stretch)
+  (declare (ignore family slant weight size spacing stretch))
   (init)
   (let ((pattern (create-pattern)))
     (with-protection (destroy-pattern pattern)
@@ -103,8 +103,8 @@
                  (translate-match font)
               (destroy-pattern font))))))))
 
-(defun list-fonts (&rest args &key family slant weight size spacing width)
-  (declare (ignore family slant weight size spacing width))
+(defun list-fonts (&rest args &key family slant weight size spacing stretch)
+  (declare (ignore family slant weight size spacing stretch))
   (init)
   (let ((pattern (create-pattern)))
     (with-protection (destroy-pattern pattern)

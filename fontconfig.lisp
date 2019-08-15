@@ -7,11 +7,10 @@
 (in-package #:org.shirakumo.font-discovery)
 
 (cffi:define-foreign-library fontconfig
-  (:linux "libfontconfig.so"))
+  (T "libfontconfig.so"))
 
 (defvar +FAMILY+ "family")              ; String
 (defvar +FILE+ "file")                  ; String
-(defvar +STYLE+ "style")                ; String
 (defvar +SLANT+ "slant")                ; Int
 (defvar +WEIGHT+ "weight")              ; Int
 (defvar +SIZE+ "size")                  ; Double Range
@@ -37,7 +36,7 @@
   (:italic 100)
   (:oblique 110))
 
-(cffi:defcenum width
+(cffi:defcenum stretch
   (:ultra-condensed 50)
   (:extra-condensed 63)
   (:condensed 75)
@@ -46,7 +45,7 @@
   (:semi-expanded 113)
   (:expanded 125)
   (:extra-expanded 150)
-  (:ulta-expanded 200))
+  (:ultra-expanded 200))
 
 (cffi:defcenum spacing
   (:proportional 0)
