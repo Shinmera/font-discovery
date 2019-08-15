@@ -17,8 +17,8 @@
                (:file "fontconfig" :if-feature :linux)
                (:file "linux" :if-feature :linux)
                (:file "osx" :if-feature :darwin)
-               (:file "directwrite" :if-feature :windows)
-               (:file "windows" :if-feature :windows)
+               (:file "directwrite" :if-feature :win32)
+               (:file "windows" :if-feature :win32)
                (:file "documentation"))
   :depends-on (:documentation-utils
                :trivial-features

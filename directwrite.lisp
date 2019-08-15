@@ -18,7 +18,6 @@
 
 (cffi:defctype word :uint16)
 (cffi:defctype dword :uint32)
-(cffi:defctype byte :uint8)
 (cffi:defctype ulong :unsigned-long)
 (cffi:defctype refiid :pointer)
 (cffi:defctype hresult :uint32)
@@ -28,7 +27,7 @@
   (data1 dword)
   (data2 word)
   (data3 word)
-  (data4 byte :count 8))
+  (data4 :uint8 :count 8))
 
 (cffi:defcstruct (com :conc-name ||)
   (vtbl :pointer))
@@ -91,7 +90,7 @@
     (setf (guid-data3 ptr) d3)
     (loop for i from 0 below 8
           for d in d4
-          do (setf (cffi:mem-aref (cffi:foreign-slot-pointer ptr '(:struct guid) 'data4) 'byte i)
+          do (setf (cffi:mem-aref (cffi:foreign-slot-pointer ptr '(:struct guid) 'data4) :uint8 i)
                    d))
     ptr))
 
@@ -143,7 +142,7 @@
   :bitmap
   :unknown)
 
-(cffi:decfenum informational-string-id
+(cffi:defcenum informational-string-id
   (:none 0)
   :copyright-notice
   :version-strings
@@ -174,11 +173,15 @@
     (collection :pointer)
     (check-for-updates :bool)))
 
-(defcomstruct dwrite-collection
+(defcomstruct dwrite-font-collection
   (get-font-family-count :uint32)
   (get-font-family hresult
     (index :uint32)
     (family :pointer))
+  (find-family-name hresult
+    (family-name :pointer)
+    (index :pointer)
+    (exists :pointer))
   (get-font-from-font-face hresult
     (font-face :pointer)
     (font :pointer)))
@@ -193,22 +196,22 @@
   (get-family-names hresult
     (names :pointer))
   (get-first-matching-font hresult
-    (weight weight)
-    (stretch stretch)
-    (slant slant)
+    (weight :uint32)
+    (stretch :uint32)
+    (slant :uint32)
     (matching-font :pointer))
   (get-matching-fonts hresult
-    (weight weight)
-    (stretch stretch)
-    (slant slant)
+    (weight :uint32)
+    (stretch :uint32)
+    (slant :uint32)
     (matching-fonts :pointer)))
 
 (defcomstruct dwrite-font
   (get-font-family hresult
     (font-family :pointer))
-  (get-weight weight)
-  (get-stretch stretch)
-  (get-slant slant)
+  (get-weight :uint32)
+  (get-stretch :uint32)
+  (get-slant :uint32)
   (is-symbol-font :bool)
   (get-face-names hresult
     (names :pointer))
@@ -314,17 +317,17 @@
     (locale-name :pointer)
     (index :pointer)
     (exists :pointer))
-  (get-locale-name-length
+  (get-locale-name-length hresult
     (index :uint32)
     (length :pointer))
-  (get-locale-name
+  (get-locale-name hresult
     (index :uint32)
     (name :pointer)
     (size :uint32))
-  (get-string-length
+  (get-string-length hresult
     (index :uint32)
     (length :pointer))
-  (get-string
+  (get-string hresult
     (index :uint32)
     (buffer :pointer)
     (size :uint32)))

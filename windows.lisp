@@ -88,8 +88,11 @@
     (cffi:with-foreign-objects ((index :uint32)
                                 (length :uint32)
                                 (exists :bool))
-      (check-result
-       (dwrite-localized-strings-find-locale-name names locale index exists))
+      (let ((locale (string->wstring "en-us")))
+        (unwind-protect
+             (check-result
+              (dwrite-localized-strings-find-locale-name names locale index exists))
+          (cffi:foreign-free locale)))
       (let ((index (if (cffi:mem-ref exists :bool)
                        (cffi:mem-ref index :uint32)
                        0)))
@@ -104,9 +107,9 @@
   (make-instance 'font
                  :file (get-font-path font)
                  :family (get-font-family family)
-                 :slant (dwrite-font-get-slant font)
-                 :weight (dwrite-font-get-weight font)
-                 :stretch (dwrite-font-get-stretch font)))
+                 :slant (maybe-enum-val 'slant (dwrite-font-get-slant font))
+                 :weight (maybe-enum-val 'weight (dwrite-font-get-weight font))
+                 :stretch (maybe-enum-val 'stretch (dwrite-font-get-stretch font))))
 
 (defun find-font (&rest args &key family slant weight size spacing stretch)
   (declare (ignore size spacing))
@@ -147,12 +150,12 @@
                            family))
                   (list (dwrite-font-family-get-matching-fonts
                          family
-                         (or weight :regular)
-                         (or stretch :normal)
-                         (or slant :normal)
+                         (maybe-enum 'weight (or weight :regular))
+                         (maybe-enum 'stretch (or stretch :normal))
+                         (maybe-enum 'slant (or slant :normal))
                          list)))
                (loop for i from 0 below (dwrite-font-list-get-font-count list)
-                     do (with-getter-value (font (dwrite-font-list-get-font list i))
+                     do (with-getter-value (font (dwrite-font-list-get-font list i font))
                           (push (translate-font font family) fonts))))))
       (cond (family
              (cffi:with-foreign-objects ((index :uint32)
@@ -165,10 +168,8 @@
                (when (cffi:mem-ref exists :bool)
                  (handle-family (cffi:mem-ref index :uint32)))))
             (T
-             (loop for i from 0 below (dwrite-collection-get-font-family-count *collection*)
+             (loop for i from 0 below (dwrite-font-collection-get-font-family-count *collection*)
                    do (handle-family i))
              ;; FIXME: reorder collected list by proximity to requested properties.
              )))
     (nreverse fonts)))
-
-
