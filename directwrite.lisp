@@ -6,10 +6,15 @@
 
 (in-package #:org.shirakumo.font-discovery)
 
+(define-foreign-library ole32
+  (T "Ole32.dll"))
+
 (cffi:define-foreign-library directwrite
   (T "Dwrite.dll"))
 
 ;; https://github.com/Alexpux/mingw-w64/blob/master/mingw-w64-headers/include/dwrite.h
+
+(defconstant CP-UTF8 65001)
 
 (defctype word :uint16)
 (defctype dword :uint32)
@@ -27,6 +32,18 @@
 
 (cffi:defcstruct (com :conc-name ||)
   (vtbl :pointer))
+
+(defcenum coinit
+  (:apartment-threaded #x2)
+  (:multi-threaded #x0)
+  (:disable-ole1dde #x4)
+  (:speed-over-memory #x8))
+
+(defcfun (co-initialize "CoInitializeEx") hresult
+  (nullable :pointer)
+  (init coinit))
+
+(defcfun (co-uninitialize "CoUninitialize") :void)
 
 (defmacro defcomfun ((struct method &rest options) return-type &body args)
   (let* ((*print-case* (readtable-case *readtable*))
@@ -311,6 +328,14 @@
     (index :uint32)
     (buffer :pointer)
     (size :uint32)))
+
+(defcomstruct dwrite-font-list
+  (get-font-collection hresult
+    (collection :pointer))
+  (get-font-count :uint32)
+  (get-font hresult
+    (index :uint32)
+    (font :pointer)))
 
 (cffi:defcfun (wide-char-to-multi-byte "WideCharToMultiByte") :int
   (code-page :uint)

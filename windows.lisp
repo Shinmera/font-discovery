@@ -13,25 +13,33 @@
   (unless (= 0 (ldb (byte 1 31) form))
     (error "Windows API call failed.")))
 
-(defun init (&key reinit)
+(defun init ()
   (unless (boundp '*factory*)
+    (cffi:use-foreign-library ole32)
+    (cffi:use-foreign-library directwrite)
+    (co-initialize (cffi:null-pointer) :multi-threaded)
     (cffi:with-foreign-object (factory :pointer)
       (check-result
        (create-factory :shared IID-IDWriteFactory factory))
       (setf *factory* (cffi:mem-ref factory :pointer))
-      (setf reinit T)))
-  (when reinit
-    (cffi:with-foreign-object (collection :pointer)
-      (check-result
-       (dwrite-factory-get-system-font-collection *factory* collection T))
-      (setf *collection* (cffi:mem-ref collection :pointer)))))
+      (refresh))))
+
+(defun refresh ()
+  (init)
+  (when (boundp '*collection*)
+    (com-release *collection*))
+  (cffi:with-foreign-object (collection :pointer)
+    (check-result
+     (dwrite-factory-get-system-font-collection *factory* collection T))
+    (setf *collection* (cffi:mem-ref collection :pointer))))
 
 (defun deinit ()
   (when (boundp '*factory*)
     (com-release *collection*)
     (makunbound '*collection*)
     (com-release *factory*)
-    (makunbound '*factory*)))
+    (makunbound '*factory*)
+    (co-uninitialize)))
 
 (defmacro with-getter-value ((var getter) &body body)
   `(cffi:with-foreign-object (,var :pointer)
@@ -101,7 +109,7 @@
                  :stretch (dwrite-font-get-stretch font)))
 
 (defun find-font (&rest args &key family slant weight size spacing stretch)
-  (declare (ignore family slant weight size spacing width))
+  (declare (ignore size spacing))
   (init)
   (cond (family
          (cffi:with-foreign-objects ((index :uint32)
@@ -127,9 +135,40 @@
         (T
          (first (apply #'list-fonts args)))))
 
-(defun list-fonts (&rest args &key family slant weight size spacing width)
-  (declare (ignore family slant weight size spacing width))
+(defun list-fonts (&key family slant weight size spacing stretch)
+  (declare (ignore size spacing))
   (init)
-  )
+  (let ((fonts ()))
+    (flet ((handle-family (index)
+             (with-getter-values
+                 ((family (dwrite-font-collection-get-font-family
+                           *collection*
+                           index
+                           family))
+                  (list (dwrite-font-family-get-matching-fonts
+                         family
+                         (or weight :regular)
+                         (or stretch :normal)
+                         (or slant :normal)
+                         list)))
+               (loop for i from 0 below (dwrite-font-list-get-font-count list)
+                     do (with-getter-value (font (dwrite-font-list-get-font list i))
+                          (push (translate-font font family) fonts))))))
+      (cond (family
+             (cffi:with-foreign-objects ((index :uint32)
+                                         (exists :bool))
+               (let ((family (string->wstring family)))
+                 (unwind-protect
+                      (check-result
+                       (dwrite-font-collection-find-family-name *collection* family index exists))
+                   (cffi:foreign-free family)))
+               (when (cffi:mem-ref exists :bool)
+                 (handle-family (cffi:mem-ref index :uint32)))))
+            (T
+             (loop for i from 0 below (dwrite-collection-get-font-family-count *collection*)
+                   do (handle-family i))
+             ;; FIXME: reorder collected list by proximity to requested properties.
+             )))
+    (nreverse fonts)))
 
 

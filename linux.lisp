@@ -9,12 +9,14 @@
 (defvar *config*)
 
 (defun init (&key reinit)
-  (when reinit
-    (config-destroy *config*)
-    (makunbound '*config*))
   (unless (boundp '*config*)
     (cffi:use-foreign-library fontconfig)
     (setf *config* (init-load-config-and-fonts))))
+
+(defun refresh ()
+  (init)
+  (config-destroy *config*)
+  (setf *config* (init-load-config-and-fonts)))
 
 (defun deinit ()
   (when (boundp '*config*)

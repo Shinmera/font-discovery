@@ -7,7 +7,16 @@
 (defpackage #:org.shirakumo.font-discovery
   (:use #:cl)
   (:export
+   #:font
+   #:file
+   #:family
+   #:slant
+   #:weight
+   #:size
+   #:spacing
+   #:stretch
    #:init
+   #:refresh
    #:deinit
    #:find-font
    #:list-fonts))
