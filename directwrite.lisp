@@ -6,7 +6,7 @@
 
 (in-package #:org.shirakumo.font-discovery)
 
-(define-foreign-library ole32
+(cffi:define-foreign-library ole32
   (T "Ole32.dll"))
 
 (cffi:define-foreign-library directwrite
@@ -16,10 +16,10 @@
 
 (defconstant CP-UTF8 65001)
 
-(defctype word :uint16)
-(defctype dword :uint32)
-(defctype byte :uint8)
-(defctype ulong :unsigned-long)
+(cffi:defctype word :uint16)
+(cffi:defctype dword :uint32)
+(cffi:defctype byte :uint8)
+(cffi:defctype ulong :unsigned-long)
 (cffi:defctype refiid :pointer)
 (cffi:defctype hresult :uint32)
 (cffi:defctype wchar :uint16)
@@ -33,17 +33,17 @@
 (cffi:defcstruct (com :conc-name ||)
   (vtbl :pointer))
 
-(defcenum coinit
+(cffi:defcenum coinit
   (:apartment-threaded #x2)
   (:multi-threaded #x0)
   (:disable-ole1dde #x4)
   (:speed-over-memory #x8))
 
-(defcfun (co-initialize "CoInitializeEx") hresult
+(cffi:defcfun (co-initialize "CoInitializeEx") hresult
   (nullable :pointer)
   (init coinit))
 
-(defcfun (co-uninitialize "CoUninitialize") :void)
+(cffi:defcfun (co-uninitialize "CoUninitialize") :void)
 
 (defmacro defcomfun ((struct method &rest options) return-type &body args)
   (let* ((*print-case* (readtable-case *readtable*))
@@ -85,13 +85,13 @@
 (trivial-indent:define-indentation defcomstruct (4 &rest (&whole 2 4 &rest 2)))
 
 (defun make-guid (d1 d2 d3 &rest d4)
-  (let ((ptr (foreign-alloc '(:struct guid))))
+  (let ((ptr (cffi:foreign-alloc '(:struct guid))))
     (setf (guid-data1 ptr) d1)
     (setf (guid-data2 ptr) d2)
     (setf (guid-data3 ptr) d3)
     (loop for i from 0 below 8
           for d in d4
-          do (setf (mem-aref (foreign-slot-pointer ptr '(:struct guid) 'data4) 'byte i)
+          do (setf (cffi:mem-aref (cffi:foreign-slot-pointer ptr '(:struct guid) 'data4) 'byte i)
                    d))
     ptr))
 
@@ -356,14 +356,14 @@
   (wide-char :int))
 
 (defun wstring->string (pointer)
-  (let ((bytes (wide-char-to-multi-byte CP-UTF8 0 pointer -1 (null-pointer) 0 (null-pointer) (null-pointer))))
-    (with-foreign-object (string :uchar bytes)
-      (wide-char-to-multi-byte CP-UTF8 0 pointer -1 string bytes (null-pointer) (null-pointer))
-      (foreign-string-to-lisp string :encoding :utf-8))))
+  (let ((bytes (wide-char-to-multi-byte CP-UTF8 0 pointer -1 (cffi:null-pointer) 0 (cffi:null-pointer) (cffi:null-pointer))))
+    (cffi:with-foreign-object (string :uchar bytes)
+      (wide-char-to-multi-byte CP-UTF8 0 pointer -1 string bytes (cffi:null-pointer) (cffi:null-pointer))
+      (cffi:foreign-string-to-lisp string :encoding :utf-8))))
 
 (defun string->wstring (string)
-  (with-foreign-string (string string)
-    (let* ((chars (multi-byte-to-wide-char CP-UTF8 0 string -1 (null-pointer) 0))
-           (pointer (foreign-alloc :uint16 :count chars)))
+  (cffi:with-foreign-string (string string)
+    (let* ((chars (multi-byte-to-wide-char CP-UTF8 0 string -1 (cffi:null-pointer) 0))
+           (pointer (cffi:foreign-alloc :uint16 :count chars)))
       (multi-byte-to-wide-char CP-UTF8 0 string -1 pointer chars)
       pointer)))
