@@ -13,6 +13,7 @@
   :homepage "https://github.com/Shinmera/font-discovery"
   :serial T
   :components ((:file "package")
+               (:file "common")
                (:file "fontconfig" :if-feature :linux)
                (:file "linux" :if-feature :linux)
                (:file "osx" :if-feature :darwin)

@@ -22,18 +22,6 @@
     (makunbound '*config*)
     (fini)))
 
-(defun maybe-enum (type thing)
-  (etypecase thing
-    (keyword (cffi:foreign-enum-value type thing))
-    (integer thing)))
-
-(defun maybe-enum-val (type thing)
-  (or (cffi:foreign-enum-keyword type thing :errorp NIL)
-      thing))
-
-(defmacro with-protection (unwind &body protected)
-  `(unwind-protect (progn ,@protected) ,unwind))
-
 (defmacro with-result (result &body success)
   (let ((resultg (gensym "RESULT")))
     `(let ((,resultg ,result))
@@ -61,14 +49,15 @@
                       (cffi:mem-ref pointer type))))
                (T
                 default))))
-      (list :file (value +FILE+ :string NIL)
-            :family (value +FAMILY+ :string NIL)
-            :slant (maybe-enum-val 'slant (value +SLANT+ :int 0))
-            :weight (maybe-enum-val 'weight (value +WEIGHT+ :int 80))
-            :size (or (value +SIZE+ :range NIL)
-                      (value +SIZE+ :double NIL))
-            :spacing (maybe-enum-val 'spacing (value +SPACING+ :int 0))
-            :stretch (maybe-enum-val 'stretch (value +WIDTH+ :int 100))))))
+      (make-instance 'font
+                     :file (value +FILE+ :string NIL)
+                     :family (value +FAMILY+ :string NIL)
+                     :slant (maybe-enum-val 'slant (value +SLANT+ :int 0))
+                     :weight (maybe-enum-val 'weight (value +WEIGHT+ :int 80))
+                     :size (or (value +SIZE+ :range NIL)
+                               (value +SIZE+ :double NIL))
+                     :spacing (maybe-enum-val 'spacing (value +SPACING+ :int 0))
+                     :stretch (maybe-enum-val 'stretch (value +WIDTH+ :int 100))))))
 
 (defun init-pattern (pattern &key family slant weight size spacing stretch)
   (when family
