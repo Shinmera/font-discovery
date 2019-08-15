@@ -16,8 +16,10 @@
                (:file "fontconfig" :if-feature :linux)
                (:file "linux" :if-feature :linux)
                (:file "osx" :if-feature :darwin)
+               (:file "directwrite" :if-feature :windows)
                (:file "windows" :if-feature :windows)
                (:file "documentation"))
   :depends-on (:documentation-utils
                :trivial-features
+               :trivial-indent
                :cffi))
