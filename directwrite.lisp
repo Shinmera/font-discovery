@@ -11,16 +11,21 @@
 
 ;; https://github.com/Alexpux/mingw-w64/blob/master/mingw-w64-headers/include/dwrite.h
 
+(defctype word :uint16)
+(defctype dword :uint32)
+(defctype byte :uint8)
+(defctype ulong :unsigned-long)
 (cffi:defctype refiid :pointer)
 (cffi:defctype hresult :uint32)
+(cffi:defctype wchar :uint16)
 
-(defcstruct (guid :conc-name guid-)
+(cffi:defcstruct (guid :conc-name guid-)
   (data1 dword)
   (data2 word)
   (data3 word)
   (data4 byte :count 8))
 
-(defcstruct (com :conc-name ||)
+(cffi:defcstruct (com :conc-name ||)
   (vtbl :pointer))
 
 (defmacro defcomfun ((struct method &rest options) return-type &body args)
@@ -30,7 +35,7 @@
     `(progn
        (declaim (inline ,name))
        (defun ,name (,structg ,@(mapcar #'first args))
-         (foreign-funcall-pointer
+         (cffi:foreign-funcall-pointer
           (,(intern (format NIL "%~a" name))
            (vtbl ,structg))
           ,options
@@ -45,13 +50,20 @@
                         `(release ulong)
                         methods)))
     `(progn
-       (defcstruct (,name :conc-name ,(format NIL "%~a-" name))
+       (cffi:defcstruct (,name :conc-name ,(format NIL "%~a-" name))
          ,@(loop for method in methods
                  collect (list (first method) :pointer)))
 
        ,@(loop for (method return . args) in methods
                collect `(defcomfun (,name ,method) ,return
                           ,@args)))))
+
+(defun com-release (pointer)
+  (cffi:foreign-funcall-pointer
+   (cffi:mem-aref (vtbl pointer) :pointer 2)
+   ()
+   :pointer pointer
+   ulong))
 
 (trivial-indent:define-indentation defcomstruct (4 &rest (&whole 2 4 &rest 2)))
 
@@ -68,8 +80,6 @@
 
 (defvar IID-IDWriteFactory
   (make-guid #xb859ee5a #xd838 #x4b5b #xa2 #xe8 #x1a #xdc #x7d #x93 #xdb #x48))
-(defvar IID-IDwriteLocalFontFileLoader
-  (make-guid #xb2d9f3ec #xc9fe #x4a11 #xa2 #xec #xd8 #x62 #x08 #xf7 #xc0 #xa2))
 
 (cffi:defcenum factory-type
   :shared
@@ -280,3 +290,55 @@
     (font-file-reference-key :pointer)
     (font-file-reference-key-size :uint32)
     (last-write-time :pointer)))
+
+(defcomstruct dwrite-localized-strings
+  (get-count :uint32)
+  (find-locale-name hresult
+    (locale-name :pointer)
+    (index :pointer)
+    (exists :pointer))
+  (get-locale-name-length
+    (index :uint32)
+    (length :pointer))
+  (get-locale-name
+    (index :uint32)
+    (name :pointer)
+    (size :uint32))
+  (get-string-length
+    (index :uint32)
+    (length :pointer))
+  (get-string
+    (index :uint32)
+    (buffer :pointer)
+    (size :uint32)))
+
+(cffi:defcfun (wide-char-to-multi-byte "WideCharToMultiByte") :int
+  (code-page :uint)
+  (flags dword)
+  (wide-char-str :pointer)
+  (wide-char :int)
+  (multi-byte-str :pointer)
+  (multi-byte :int)
+  (default-char :pointer)
+  (used-default-char :pointer))
+
+(cffi:defcfun (multi-byte-to-wide-char "MultiByteToWideChar") :int
+  (code-page :uint)
+  (flags dword)
+  (multi-byte-str :pointer)
+  (multi-byte :int)
+  (wide-char-str :pointer)
+  (wide-char :int))
+
+(defun wstring->string (pointer)
+  (let ((bytes (wide-char-to-multi-byte CP-UTF8 0 pointer -1 (null-pointer) 0 (null-pointer) (null-pointer))))
+    (with-foreign-object (string :uchar bytes)
+      (wide-char-to-multi-byte CP-UTF8 0 pointer -1 string bytes (null-pointer) (null-pointer))
+      (foreign-string-to-lisp string :encoding :utf-8))))
+
+(defun string->wstring (string)
+  (with-foreign-string (string string)
+    (let* ((chars (multi-byte-to-wide-char CP-UTF8 0 string -1 (null-pointer) 0))
+           (pointer (foreign-alloc :uint16 :count chars)))
+      (multi-byte-to-wide-char CP-UTF8 0 string -1 pointer chars)
+      pointer)))
