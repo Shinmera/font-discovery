@@ -31,7 +31,8 @@
   (cffi:with-foreign-object (collection :pointer)
     (check-result
      (dwrite-factory-get-system-font-collection *factory* collection T))
-    (setf *collection* (cffi:mem-ref collection :pointer))))
+    (setf *collection* (cffi:mem-ref collection :pointer)))
+  T)
 
 (defun deinit ()
   (when (boundp '*factory*)
@@ -39,7 +40,8 @@
     (makunbound '*collection*)
     (com-release *factory*)
     (makunbound '*factory*)
-    (co-uninitialize)))
+    (co-uninitialize)
+    T))
 
 (defmacro with-getter-value ((var getter) &body body)
   `(cffi:with-foreign-object (,var :pointer)

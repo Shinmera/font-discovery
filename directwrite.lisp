@@ -105,12 +105,15 @@
   (:thin 100)
   (:extra-light 200)
   (:light 300)
+  (:semi-light 350)
+  (:book 375)
   (:regular 400)
   (:medium 500)
-  (:semibold 600)
+  (:semi-bold 600)
   (:bold 700)
   (:extra-bold 800)
-  (:black 900))
+  (:black 900)
+  (:extra-black 1000))
 
 (cffi:defcenum stretch
   (:ultra-condensed 1)
@@ -124,7 +127,7 @@
   (:ultra-expanded 9))
 
 (cffi:defcenum slant
-  (:normal 0)
+  (:roman 0)
   :oblique
   :italic)
 

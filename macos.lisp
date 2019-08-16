@@ -18,7 +18,8 @@
 
 (defun deinit ()
   (when *init*
-    (setf *init* NIL)))
+    (setf *init* NIL)
+    T))
 
 (defun translate-value (value table)
   (etypecase value
@@ -160,9 +161,10 @@
   (with-attributes (attributes mandatory args)
     (with-foundation-object (descriptor (create-font-descriptor attributes))
       (let ((normalized (font-descriptor-create-matching-font-descriptor descriptor mandatory)))
-        (with-protection (unless (cffi:pointer-eq descriptor normalized)
-                           (release normalized))
-          (translate-descriptor normalized))))))
+        (unless (cffi:null-pointer-p normalized)
+          (with-protection (unless (cffi:pointer-eq descriptor normalized)
+                             (release normalized))
+            (translate-descriptor normalized)))))))
 
 (defun list-fonts (&rest args &key family slant weight spacing stretch)
   (declare (ignore family slant weight spacing stretch))
