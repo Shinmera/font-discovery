@@ -11,7 +11,6 @@
    (family :initarg :family :initform (error "FAMILY required.") :reader family)
    (slant :initarg :slant :initform :roman :reader slant)
    (weight :initarg :weight :initform :regular :reader weight)
-   (size :initarg :size :initform NIL :reader size)
    (spacing :initarg :spacing :initform :proportional :reader spacing)
    (stretch :initarg :stretch :initform :normal :reader stretch)))
 

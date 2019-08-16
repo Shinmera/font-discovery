@@ -111,8 +111,8 @@
                  :weight (maybe-enum-val 'weight (dwrite-font-get-weight font))
                  :stretch (maybe-enum-val 'stretch (dwrite-font-get-stretch font))))
 
-(defun find-font (&rest args &key family slant weight size spacing stretch)
-  (declare (ignore size spacing))
+(defun find-font (&rest args &key family slant weight spacing stretch)
+  (declare (ignore spacing))
   (init)
   (cond (family
          (cffi:with-foreign-objects ((index :uint32)
@@ -138,8 +138,8 @@
         (T
          (first (apply #'list-fonts args)))))
 
-(defun list-fonts (&key family slant weight size spacing stretch)
-  (declare (ignore size spacing))
+(defun list-fonts (&key family slant weight spacing stretch)
+  (declare (ignore spacing))
   (init)
   (let ((fonts ()))
     (flet ((handle-family (index)
