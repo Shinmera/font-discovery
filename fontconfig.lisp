@@ -49,8 +49,8 @@
 
 (cffi:defcenum spacing
   (:proportional 0)
-  (:dual 90)
-  (:mono 100)
+  (:dualspace 90)
+  (:monospace 100)
   (:charcell 110))
 
 (cffi:defcenum match-kind
