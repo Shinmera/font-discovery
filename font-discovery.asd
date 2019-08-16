@@ -5,7 +5,7 @@
 |#
 
 (asdf:defsystem font-discovery
-  :version "0.0.0"
+  :version "1.0.0"
   :license "zlib"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"

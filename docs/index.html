@@ -1,0 +1,169 @@
+<!DOCTYPE html> <html lang="EN"> <head> <meta charset="utf-8"> <title>Font Discovery</title> <style>html body{margin:0 auto 0 auto;padding:20px;max-width:1024px;font-family:sans-serif;font-size:14pt;overflow-y:scroll;}html body a{text-decoration:none;}html body a[href]{color:#0055AA;}html body a[href]:hover{color:#0088EE;}html body pre{background:#FAFAFA;border:1px solid #DDDDDD;padding:0.75em;overflow-x:auto;}html body pre >code a[href]{color:#223388;}article.project h1,article.project h2,article.project h3,article.project h4,article.project h5,article.project h6{margin:0.2em 0 0.1em 0;text-indent:1em;}article.project >header{text-align:center;}article.project >header img.logo{display:block;margin:auto;max-height:170px;}article.project >header h1{display:inline-block;text-indent:0;font-size:2.5em;}article.project >header .version{vertical-align:bottom;}article.project >header .languages{margin-top:-0.5em;text-transform:capitalize;}article.project >header .description{margin:0;}article.project >header .pages{margin-top:0.5em;font-size:1.2em;text-transform:capitalize;}article.project >header .pages a{display:inline-block;padding:0 0.2em;}article.project >section{margin:1em 0 1em 0;}article.project #index >ul{list-style:none;margin:0;padding:0;}article.project .row label{display:inline-block;min-width:6em;}article.project #system .row{display:flex;}article.project #system #dependencies{display:inline;margin:0;padding:0;}article.project #system #dependencies li{display:inline;padding:0 0.2em;}article.definition{margin:1em 0 0 0;}article.definition >header h1,article.definition >header h2,article.definition >header h3,article.definition >header h4,article.definition >header h5,article.definition >header h6{text-indent:0;display:inline-block;}article.definition >header ul{display:inline-block;list-style:none;margin:0;padding:0;}article.definition >header ul li{display:inline-block;padding:0 0.2em 0 0;}article.definition >header .visibility{display:none;}article.definition >header .visibility,article.definition >header .type{text-transform:lowercase;}article.definition >header .source-link{visibility:hidden;float:right;}article.definition >header .source-link:after{visibility:visible;content:"[SRC]";}article.definition .docstring{margin:0 0 0 1em;}article.definition .docstring pre{font-size:0.8em;white-space:pre-wrap;}.definition.package >header ul.nicknames{display:inline-block;list-style:none;margin:0;padding:0 0 0 1em;}.definition.package >header ul.nicknames li{display:inline;}.definition.package >header ul.nicknames:before{content:"(";}.definition.package >header ul.nicknames:after{content:")";}.definition.package ul.definitions{margin:0;list-style:none;padding:0 0 0 0.5em;}.definition.callable >header .name:before,.definition.type >header .name:before{content:"(";font-weight:normal;}.definition.callable >header .arguments:after,.definition.type >header .arguments:after{content:")";}.definition.callable >header .arguments .arguments:before,.definition.type >header .arguments .arguments:before{content:"(";}.definition.callable >header .arguments .argument,.definition.type >header .arguments .argument{padding:0;}.definition.callable >header .arguments .argument.lambda-list-keyword,.definition.type >header .arguments .argument.lambda-list-keyword{color:#991155;}.definition li>mark{background:none;border-left:0.3em solid #0088EE;padding-left:0.3em;display:block;}</style> </head> <body> <article class="project"> <header>  <h1>font discovery</h1>  <span class="version">1.0.0</span>  <nav class="languages">  <a href="index.html">English</a>  </nav>  <p class="description">Find system font files matching a font spec.</p>  <nav class="pages">  <a href="index.html">font discovery</a>  </nav> </header> <section id="documentation"><article><h2 id="About Font-Discovery">About Font-Discovery</h2><p>This is a library to find system font files. It works on systems with DirectWrite (Windows), CoreText (macOS, iOS), and FontConfig (Linux, BSD). It does not have any foreign dependencies that aren't already directly available on the system.</p><h2 id="How To">How To</h2><p>You can list all fonts by using <code><a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ALIST-FONTS" class="xref">list-fonts</a></code>, or find a specific font using <code><a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFIND-FONT" class="xref">find-font</a></code>. Both of these functions take a number of arguments to query for fonts with specific properties (<code><a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASLANT" class="xref">slant</a></code>, <code><a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AWEIGHT" class="xref">weight</a></code>, <code><a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASPACING" class="xref">spacing</a></code>, <code><a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASTRETCH" class="xref">stretch</a></code>). Both of them return <code><a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">font</a></code> instances, from which you can query the precise properties, as well as their font file location with <code><a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFILE" class="xref">file</a></code>.</p></article></section>   <section id="system"> <h2>System Information</h2>  <div class="row"> <label for="version">Version:</label> <a id="version">1.0.0</a> </div>   <div class="row"> <label for="dependencies">Dependencies:</label> <ul id="dependencies"><li><a class="external" href="https://Shinmera.github.io/documentation-utils/">documentation-utils</a></li><li><a class="external">trivial-features</a></li><li><a class="external" href="https://shinmera.github.io/trivial-indent/">trivial-indent</a></li><li><a class="external">cffi</a></li></ul> </div>   <div class="row"> <label for="author">Author:</label> <a id="author" href="mailto:shinmera@tymoon.eu">Nicolas Hafner</a> </div>   <div class="row"> <label for="license">License:</label> <a id="license" href="https://github.com/Shinmera/font-discovery/blob/master/LICENSE">zlib</a> </div>   <div class="row"> <label for="homepage">Homepage:</label> <a id="homepage" href="https://github.com/Shinmera/font-discovery">https://github.com/Shinmera/font-discovery</a> </div>  </section>   <section id="index"> <h2>Definition Index</h2> <ul> <li> <article class="definition package" id="PACKAGE ORG.SHIRAKUMO.FONT-DISCOVERY"> <header> <h3> <a href="#PACKAGE%20ORG.SHIRAKUMO.FONT-DISCOVERY">ORG.SHIRAKUMO.FONT-DISCOVERY</a> </h3> <ul class="nicknames"></ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> <ul class="definitions"> <li> <article class="definition class" id="CLASS ORG.SHIRAKUMO.FONT-DISCOVERY:FONT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT">FONT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/font-discovery/blob/master/common.lisp#L9">Source</a>  </header> <div class="docstring"><pre>A representation of a system font and its font attributes.
+
+See <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFILE" class="xref">FILE</a>
+See <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFAMILY" class="xref">FAMILY</a>
+See <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASLANT" class="xref">SLANT</a>
+See <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AWEIGHT" class="xref">WEIGHT</a>
+See <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASPACING" class="xref">SPACING</a>
+See <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASTRETCH" class="xref">STRETCH</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:DEINIT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ADEINIT">DEINIT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/font-discovery/blob/master/linux.lisp#L21">Source</a>  </header> <div class="docstring"><pre>Uninitializes the library.
+
+This will shut down foreign libraries and deallocate cache memory.
+Returns T if it did so.
+
+It will not close the foreign libraries that were opened by INIT.
+
+It is safe to call this function multiple times.
+
+See <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AINIT" class="xref">INIT</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:FIND-FONT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFIND-FONT">FIND-FONT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments">  <li class="argument lambda-list-keyword">&amp;REST</li>    <li class="argument">ARGS</li>    <li class="argument lambda-list-keyword">&amp;KEY</li>    <li class="argument">FAMILY</li>    <li class="argument">SLANT</li>    <li class="argument">WEIGHT</li>    <li class="argument">SPACING</li>    <li class="argument">STRETCH</li>  </ul>  <a class="source-link" href="https://github.com/Shinmera/font-discovery/blob/master/linux.lisp#L77">Source</a>  </header> <div class="docstring"><pre>Attempts to find a font with specifications that match the query as close as possible.
+
+Returns a FONT instance, or NIL if no match can be found.
+Note that on some systems the returned font may not be an exact
+match, but rather a closest approximation.
+
+For the possible values of the arguments, see the FONT class and its
+reader functions.
+
+Doing this will automatically call INIT.
+
+See <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ALIST-FONTS" class="xref">LIST-FONTS</a>
+See <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AINIT" class="xref">INIT</a>
+See <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">FONT</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:INIT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AINIT">INIT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/font-discovery/blob/master/linux.lisp#L11">Source</a>  </header> <div class="docstring"><pre>Initializes the library for use.
+
+This will load foreign libraries and set up internal state if
+necessary. Returns T if it did so.
+
+It is safe to call this function multiple times.
+
+See <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AREFRESH" class="xref">REFRESH</a>
+See <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ADEINIT" class="xref">DEINIT</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:LIST-FONTS"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ALIST-FONTS">LIST-FONTS</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments">  <li class="argument lambda-list-keyword">&amp;REST</li>    <li class="argument">ARGS</li>    <li class="argument lambda-list-keyword">&amp;KEY</li>    <li class="argument">FAMILY</li>    <li class="argument">SLANT</li>    <li class="argument">WEIGHT</li>    <li class="argument">SPACING</li>    <li class="argument">STRETCH</li>  </ul>  <a class="source-link" href="https://github.com/Shinmera/font-discovery/blob/master/linux.lisp#L90">Source</a>  </header> <div class="docstring"><pre>Returns a list of fonts with specifications that match the query.
+
+Returns a list of FONT instances that match the query.
+
+For the possible values of the arguments, see the FONT class and its
+reader functions.
+
+Doing this will automatically call INIT.
+
+See <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFIND-FONT" class="xref">FIND-FONT</a>
+See <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AINIT" class="xref">INIT</a>
+See <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">FONT</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:REFRESH"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AREFRESH">REFRESH</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/font-discovery/blob/master/linux.lisp#L16">Source</a>  </header> <div class="docstring"><pre>Refreshes the font cache.
+
+This should cause new system fonts to be recognised. You should call
+this function whenever you think the list of system fonts might have
+changed. Returns T if the cache was updated.
+
+Doing this will automatically call INIT.
+
+See <a href="#FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AINIT" class="xref">INIT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:FAMILY"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFAMILY">FAMILY</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments">  <li class="argument">OBJECT</li>  </ul>  </header> <div class="docstring"><pre>Returns the font family name.
+
+See <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">FONT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:FILE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFILE">FILE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments">  <li class="argument">OBJECT</li>  </ul>  </header> <div class="docstring"><pre>Returns the pathname to the font file.
+
+This may be a TTF or OTF file.
+
+See <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">FONT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:SLANT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASLANT">SLANT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments">  <li class="argument">OBJECT</li>  </ul>  </header> <div class="docstring"><pre>Returns the slant of the font.
+
+This may be one of the following keywords, in order of increasing
+slant, or a system-dependent numeric value for the font's slant.
+
+  :ROMAN
+  :ITALIC
+  :OBLIQUE
+
+See <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">FONT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:SPACING"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASPACING">SPACING</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments">  <li class="argument">OBJECT</li>  </ul>  </header> <div class="docstring"><pre>Returns the font's spacing.
+
+This may be one of the following keywords, in order of increasing
+spacing, or a system-dependent numeric value for the font's spacing.
+
+  :PROPORTIONAL
+  :DUALSPACE
+  :MONOSPACE
+  :CHARCELL
+
+See <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">FONT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:STRETCH"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3ASTRETCH">STRETCH</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments">  <li class="argument">OBJECT</li>  </ul>  </header> <div class="docstring"><pre>Returns the font's stretch factor.
+
+This may be one of the following keywords, in order of increasing
+stretch factor, or a system-dependent numeric value for the font's
+stretch factor.
+
+ :ULTRA-CONDENSED
+ :EXTRA-CONDENSED
+ :CONDENSED
+ :SEMI-CONDENSED
+ :NORMAL
+ :SEMI-EXPANDED
+ :EXPANDED
+ :EXTRA-EXPANDED
+ :ULTRA-EXPANDED
+
+See <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">FONT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION ORG.SHIRAKUMO.FONT-DISCOVERY:WEIGHT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AWEIGHT">WEIGHT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments">  <li class="argument">OBJECT</li>  </ul>  </header> <div class="docstring"><pre>Returns the weight of the font.
+
+This may be one of the following keywords, in order of increasing
+weight, or a system-dependent numeric value for the font's weight.
+
+  :THIN
+  :EXTRA-LIGHT
+  :LIGHT
+  :SEMI-LIGHT
+  :BOOK
+  :REGULAR
+  :MEDIUM
+  :SEMI-BOLD
+  :BOLD
+  :EXTRA-BOLD
+  :BLACK
+  :EXTRA-BLACK
+
+See <a href="#CLASS%20ORG.SHIRAKUMO.FONT-DISCOVERY%3AFONT" class="xref">FONT</a></pre></div> </article> </li> </ul> </article> </li> </ul> </section> </article> <script>window.addEventListener("DOMContentLoaded", function(){
+    var unmarkElement = function(el){
+        if(el.tagName === "mark" || el.tagName === "MARK"){
+            [].forEach.call(el.childNodes, function(child){
+                el.parentNode.insertBefore(child, el);
+            });
+            el.parentNode.removeChild(el);
+        }else if(el.parentNode.tagName === "mark"){
+            return unmarkElement(el.parentNode);
+        }
+        return null;
+    }
+
+    var unmarkAll = function(root){
+        root = root || document;
+        [].forEach.call(root.querySelectorAll("mark"), unmarkElement);
+    }
+    
+    var markElement = function(el){
+        if(el.parentNode.tagName === "mark" || el.parentNode.tagName === "MARK"){
+            return el.parentNode;
+        } else {
+            unmarkAll();
+            var marked = document.createElement("mark");
+            el.parentNode.insertBefore(marked, el);
+            marked.appendChild(el);
+            return marked;
+        }
+    }
+
+    var markFragmented = function(){
+        if(window.location.hash){
+            var el = document.getElementById(decodeURIComponent(window.location.hash.substr(1)));
+            if(el) markElement(el);
+        }
+    }
+
+    var registerXrefLink = function(link){
+        var el = document.getElementById(decodeURIComponent(link.getAttribute("href").substr(1)));
+        if(el){
+            link.addEventListener("click", function(){
+                markElement(el);
+            });
+        }
+    }
+
+    var registerXrefLinks = function(root){
+        root = root || document;
+        [].forEach.call(root.querySelectorAll("a.xref"), registerXrefLink);
+    }
+
+    markFragmented();
+    registerXrefLinks();
+}); </script> </body> </html> 
