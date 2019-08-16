@@ -141,7 +141,7 @@
     (with-attribute (traits traits-attribute)
       (make-instance 'font :file (with-attribute (url url-attribute)
                                    (with-foundation-object (path (url-copy-file-system-path url :unix))
-                                     (cfstring->string path)))
+                                     (parse-file (cfstring->string path))))
                            :family (with-attribute (family family-name-attribute)
                                      (cfstring->string family))
                            :slant (with-trait (slant slant-trait)

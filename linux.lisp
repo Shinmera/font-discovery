@@ -52,7 +52,7 @@
                (T
                 default))))
       (make-instance 'font
-                     :file (value +FILE+ :string NIL)
+                     :file (parse-file (value +FILE+ :string NIL))
                      :family (value +FAMILY+ :string NIL)
                      :slant (maybe-enum-val 'slant (value +SLANT+ :int 0))
                      :weight (maybe-enum-val 'weight (value +WEIGHT+ :int 80))

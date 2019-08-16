@@ -107,7 +107,7 @@
 
 (defun translate-font (font family)
   (make-instance 'font
-                 :file (get-font-path font)
+                 :file (parse-file (get-font-path font))
                  :family (get-font-family family)
                  :slant (maybe-enum-val 'slant (dwrite-font-get-slant font))
                  :weight (maybe-enum-val 'weight (dwrite-font-get-weight font))
