@@ -22,46 +22,68 @@
 
 (defun translate-value (value table)
   (etypecase value
-    (real   (or (first (find value table :key #'second))
-                value))
-    (symbol (or (second (find value table :key #'first))
-                (error "No such name ~s." value)))))
+    (real
+     ;; Find closest value in table
+     (if (< value (second (first table)))
+         (first (first table))
+         (loop for (prev entry) on table
+               do (cond ((null entry)
+                         (return (first prev)))
+                        ((<= (second prev) value (second entry))
+                         (return (if (< (- value (second prev))
+                                        (- (second entry) value))
+                                     (first prev)
+                                     (first entry))))))))
+    (symbol
+     (or (second (find value table :key #'first))
+         (error "No such name ~s." value)))))
 
 (defun translate-weight (value)
   (translate-value
    value
-   '((:thin        -1.0)
-     (:extra-light -0.0)
-     (:light       -0.0)
-     (:semi-light  -0.0)
-     (:book        -0.0)
+   '((:thin        -0.8)
+     (:extra-light -0.5)
+     (:light       -0.4)
+     (:semi-light  -0.3)
+     (:book        -0.2)
      (:regular      0.0)
-     (:medium      +0.0)
-     (:semi-bold   +0.0)
-     (:bold        +0.0)
-     (:extra-bold  +0.0)
-     (:black       +0.0)
-     (:extra-black +1.0))))
+     (:medium      +0.2)
+     (:semi-bold   +0.3)
+     (:bold        +0.4)
+     (:extra-bold  +0.5)
+     (:black       +0.6)
+     (:extra-black +0.8))))
 
 (defun translate-slant (value)
   (translate-value
    value
    '((:roman    0.0)
-     (:italic  +0.0)
-     (:oblique +0.0))))
+     (:italic  +0.06)
+     (:oblique +0.1))))
 
 (defun translate-stretch (value)
   (translate-value
    value
-   '((:ultra-condensed -1.0)
-     (:extra-condensed -0.0)
-     (:condensed       -0.0)
-     (:semi-condensed  -0.0)
+   '((:ultra-condensed -0.4)
+     (:extra-condensed -0.3)
+     (:condensed       -0.2)
+     (:semi-condensed  -0.1)
      (:normal           0.0)
-     (:semi-expanded   +0.0)
-     (:expanded        +0.0)
-     (:extra-expanded  +0.0)
-     (:ultra-expanded  +1.0))))
+     (:semi-expanded   +0.1)
+     (:expanded        +0.2)
+     (:extra-expanded  +0.3)
+     (:ultra-expanded  +0.4))))
+
+(defun number-value (number type)
+  (cffi:with-foreign-object (value type)
+    (unless (number-get-value number type value)
+      (error "Failed to retrieve numerical value."))
+    (cffi:mem-ref value type)))
+
+(defun value-number (number type)
+  (cffi:with-foreign-object (value type)
+    (setf (cffi:mem-ref value type) number)
+    (create-number (cffi:null-pointer) type value)))
 
 (defmacro with-foundation-object ((var init &optional fail) &body body)
   `(let ((,var ,init))
@@ -70,51 +92,41 @@
          (with-protection (release ,var)
            ,@body))))
 
-(defun create-traits (weight stretch slant spacing)
-  (let ((count 0))
-    (cffi:with-foreign-objects ((keys :pointer 4)
-                                (values :pointer 4))
-      (flet (((setf entry) (value key)
-               (setf (cffi:mem-aref keys count) key)
-               (setf (cffi:mem-aref values count) value)
-               (incf count)))
-        (when weight
-          (setf (entry weight-trait) (translate-weight weight)))
-        (when stretch
-          (setf (entry width-trait) (translate-stretch stretch)))
-        (when slant
-          (setf (entry slant-trait) (translate-slant slant)))
-        (when (eq spacing :monospace)
-          (setf (entry symbolic-trait) (cffi:foreign-enum-value 'symbolic-traits :monospace)))
-        (create-dictionary (cffi:null-pointer) keys values count (cffi:null-pointer) (cffi:null-pointer))))))
+(defmacro with-dictionary ((dictionary max) entries &body body)
+  `(cffi:with-foreign-objects ((keys :pointer ,max)
+                               (values :pointer ,max))
+     (let ((count 0))
+       (flet (((setf entry) (value key)
+                (setf (cffi:mem-aref keys :pointer count) key)
+                (setf (cffi:mem-aref values :pointer count) value)
+                (incf count)))
+         ,@entries
+         (with-protection (loop for i from 0 below count
+                                do (release (cffi:mem-aref values :pointer i)))
+           (let ((,dictionary (create-dictionary (cffi:null-pointer) keys values count (cffi:null-pointer) (cffi:null-pointer))))
+             ,@body))))))
+
+(trivial-indent:define-indentation with-dictionary (6 4 &body))
 
 (defun call-with-attributes (function &key family slant weight spacing stretch)
-  (let ((count 0))
-    (cffi:with-foreign-objects ((keys :pointer 2)
-                                (values :pointer 2))
-      (with-protection
-          (loop for i from 0 below count
-                do (release (cffi:mem-aref values i)))
-        (when family
-          (setf (cffi:mem-aref keys count) family-name-attribute)
-          (setf (cffi:mem-aref values count) (string->cfstring family))
-          (incf count))
-        (when (or weight stretch slant spacing)
-          (setf (cffi:mem-aref keys count) traits-attribute)
-          (setf (cffi:mem-aref values count) (create-traits weight stretch slant spacing))
-          (incf count))
-        (with-foundation-object (dictionary (create-dictionary (cffi:null-pointer) keys values count (cffi:null-pointer) (cffi:null-pointer)))
-          (with-foundation-object (set (create-set (cffi:null-pointer) keys count (cffi:null-pointer)))
-            (funcall function dictionary set)))))))
+  (with-dictionary (traits 4)
+      ((when weight
+         (setf (entry weight-trait) (value-number (translate-weight weight) :double)))
+       (when stretch
+         (setf (entry width-trait) (value-number (translate-stretch stretch) :double)))
+       (when slant
+         (setf (entry slant-trait) (value-number (translate-slant slant) :double)))
+       (when (eq spacing :monospace)
+         (setf (entry symbolic-trait) (value-number (cffi:foreign-enum-value 'symbolic-traits :monospace) :int32))))
+    (with-dictionary (attributes 2)
+        ((when family
+           (setf (entry family-name-attribute) (string->cfstring family)))
+         (setf (entry traits-attribute) traits))
+      (with-foundation-object (set (create-set (cffi:null-pointer) keys count (cffi:null-pointer)))
+        (funcall function attributes set)))))
 
 (defmacro with-attributes ((attributes mandatory fontspec) &body body)
   `(apply #'call-with-attributes (lambda (,attributes ,mandatory) ,@body) ,fontspec))
-
-(defun number-value (number type)
-  (cffi:with-foreign-object (value type)
-    (unless (number-get-value number type value)
-      (error "Failed to retrieve numerical value."))
-    (cffi:mem-ref value type)))
 
 (defun translate-descriptor (descriptor)
   (macrolet ((with-attribute ((var attr) &body body)
@@ -157,9 +169,7 @@
   (init)
   (with-attributes (attributes mandatory args)
     (with-foundation-object (descriptor (create-font-descriptor attributes))
-      (with-foundation-object (array (font-descriptor-create-matching-font-descriptors descriptor mandatory))
+      (with-foundation-object (array (font-descriptor-create-matching-font-descriptors descriptor mandatory) NIL)
         (loop for i from 0 below (array-get-count array)
               for normalized = (array-get-value-at-index array i)
-              collect (translate-descriptor normalized)
-              do (unless (cffi:pointer-eq descriptor normalized)
-                   (release normalized)))))))
+              collect (translate-descriptor normalized))))))
