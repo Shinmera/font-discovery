@@ -2,4 +2,4 @@
 This is a library to find system font files. It works on systems with DirectWrite (Windows), CoreText (macOS, iOS), and FontConfig (Linux, BSD). It does not have any foreign dependencies that aren't already directly available on the system.
 
 ## How To
-You can list all fonts by using ``list-fonts``, or find a specific font using ``find-font``. Both of these functions take a number of arguments to query for fonts with specific properties (``slant``, ``weight``, ``spacing``, ``stretch``). Both of them return ``font`` instances, from which you can query the precise properties, as well as their font file location with ``file``.
+You can list all fonts by using ``list-fonts``, or find a specific font using ``find-font``. Both of these functions take a number of arguments to query for fonts with specific properties (``family``, ``slant``, ``weight``, ``spacing``, ``stretch``). Both of them return ``font`` instances, from which you can query the precise properties, as well as their font file location with ``file``.
