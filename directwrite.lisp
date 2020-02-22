@@ -94,8 +94,14 @@
                    d))
     ptr))
 
-(defvar IID-IDWriteFactory
-  (make-guid #xb859ee5a #xd838 #x4b5b #xa2 #xe8 #x1a #xdc #x7d #x93 #xdb #x48))
+(defmacro define-guid (name &rest guid)
+  `(let (value)
+     (defun ,name ()
+       (or value (setf value (make-guid ,@guid))))
+     (define-symbol-macro ,name (,name))))
+
+(define-guid IID-IDWriteFactory
+  #xb859ee5a #xd838 #x4b5b #xa2 #xe8 #x1a #xdc #x7d #x93 #xdb #x48)
 
 (cffi:defcenum factory-type
   :shared
