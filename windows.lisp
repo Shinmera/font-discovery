@@ -132,9 +132,9 @@
                            family))
                   (font (dwrite-font-family-get-first-matching-font
                          family
-                         (maybe-enum 'weight weight)
-                         (maybe-enum 'stretch stretch)
-                         (maybe-enum 'slant slant)
+                         (maybe-enum 'weight (or weight :regular))
+                         (maybe-enum 'stretch (or stretch :normal))
+                         (maybe-enum 'slant (or slant :roman))
                          font)))
                (translate-font font family)))))
         (T
