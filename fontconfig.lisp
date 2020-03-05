@@ -7,7 +7,7 @@
 (in-package #:org.shirakumo.font-discovery)
 
 (cffi:define-foreign-library fontconfig
-  (T "libfontconfig.so"))
+  (T (:or "libfontconfig.so.1" "libfontconfig.so")))
 
 (defvar +FAMILY+ "family")              ; String
 (defvar +FILE+ "file")                  ; String
