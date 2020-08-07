@@ -154,7 +154,7 @@
                          family
                          (maybe-enum 'weight (or weight :regular))
                          (maybe-enum 'stretch (or stretch :normal))
-                         (maybe-enum 'slant (or slant :normal))
+                         (maybe-enum 'slant (or slant :roman))
                          list)))
                (loop for i from 0 below (dwrite-font-list-get-font-count list)
                      do (with-getter-value (font (dwrite-font-list-get-font list i font))
