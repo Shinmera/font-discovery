@@ -83,7 +83,9 @@
 
 (defun value-number (number type)
   (cffi:with-foreign-object (value type)
-    (setf (cffi:mem-ref value type) number)
+    (setf (cffi:mem-ref value type) (ecase type
+                                      (:double (float number 0d0))
+                                      (:int32 (truncate number))))
     (create-number (cffi:null-pointer) type value)))
 
 (defmacro with-foundation-object ((var init &optional fail) &body body)
