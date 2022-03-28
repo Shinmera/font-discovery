@@ -15,39 +15,31 @@
 
 (defun init ()
   (unless (boundp '*factory*)
-    (cffi:use-foreign-library ole32)
+    (com:init)
     (cffi:use-foreign-library directwrite)
-    (co-initialize (cffi:null-pointer) :multi-threaded)
-    (cffi:with-foreign-object (factory :pointer)
-      (check-result
-       (create-factory :shared IID-IDWriteFactory factory))
-      (setf *factory* (cffi:mem-ref factory :pointer))
-      (refresh))))
+    (setf *factory* (com:with-deref (factory :pointer) (create-factory :shared IID-IDWriteFactory factory)))
+    (refresh)))
 
 (defun refresh ()
   (init)
   (when (boundp '*collection*)
-    (com-release *collection*))
-  (cffi:with-foreign-object (collection :pointer)
-    (check-result
-     (dwrite-factory-get-system-font-collection *factory* collection T))
-    (setf *collection* (cffi:mem-ref collection :pointer)))
+    (com:release *collection*))
+  (setf *collection* (com:with-deref (collection :pointer) (dwrite-factory-get-system-font-collection *factory* collection T)))
   T)
 
 (defun deinit ()
   (when (boundp '*factory*)
-    (com-release *collection*)
+    (com:release *collection*)
     (makunbound '*collection*)
-    (com-release *factory*)
+    (com:release *factory*)
     (makunbound '*factory*)
-    (co-uninitialize)
     T))
 
 (defmacro with-getter-value ((var getter) &body body)
   `(cffi:with-foreign-object (,var :pointer)
      (check-result ,getter)
      (let ((,var (cffi:mem-ref ,var :pointer)))
-       (with-protection (com-release ,var)
+       (with-protection (com:release ,var)
          ,@body))))
 
 (defmacro with-getter-values (values &body body)
@@ -83,18 +75,16 @@
           (cffi:mem-ref size :uint32)
           path
           (1+ (cffi:mem-ref length :uint32))))
-        (wstring->string path)))))
+        (com:wstring->string path)))))
 
 (defun get-font-family (family)
   (with-getter-value (names (dwrite-font-family-get-family-names family names))
     (cffi:with-foreign-objects ((index :uint32)
                                 (length :uint32)
                                 (exists :bool))
-      (let ((locale (string->wstring "en-us")))
-        (unwind-protect
-             (check-result
-              (dwrite-localized-strings-find-locale-name names locale index exists))
-          (cffi:foreign-free locale)))
+      (com:with-wstring (locale "en-us")
+        (check-result
+         (dwrite-localized-strings-find-locale-name names locale index exists)))
       (let ((index (if (cffi:mem-ref exists :bool)
                        (cffi:mem-ref index :uint32)
                        0)))
@@ -103,7 +93,7 @@
         (cffi:with-foreign-object (string 'wchar (1+ (cffi:mem-ref length :uint32)))
           (check-result
            (dwrite-localized-strings-get-string names index string (1+ (cffi:mem-ref length :uint32))))
-          (wstring->string string))))))
+          (com:wstring->string string))))))
 
 (defun translate-font (font family)
   (make-instance 'font
@@ -119,11 +109,9 @@
   (cond (family
          (cffi:with-foreign-objects ((index :uint32)
                                      (exists :bool))
-           (let ((family (string->wstring family)))
-             (unwind-protect
-                  (check-result
-                   (dwrite-font-collection-find-family-name *collection* family index exists))
-               (cffi:foreign-free family)))
+           (com:with-wstring (family family)
+             (check-result
+              (dwrite-font-collection-find-family-name *collection* family index exists)))
            (when (cffi:mem-ref exists :bool)
              (with-getter-values
                  ((family (dwrite-font-collection-get-font-family
@@ -162,11 +150,9 @@
       (cond (family
              (cffi:with-foreign-objects ((index :uint32)
                                          (exists :bool))
-               (let ((family (string->wstring family)))
-                 (unwind-protect
-                      (check-result
-                       (dwrite-font-collection-find-family-name *collection* family index exists))
-                   (cffi:foreign-free family)))
+               (com:with-wstring (family family)
+                 (check-result
+                  (dwrite-font-collection-find-family-name *collection* family index exists)))
                (when (cffi:mem-ref exists :bool)
                  (handle-family (cffi:mem-ref index :uint32)))))
             (T

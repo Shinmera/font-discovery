@@ -12,6 +12,7 @@
   :description "Find system font files matching a font spec."
   :homepage "https://github.com/Shinmera/font-discovery"
   :serial T
+  :defsystem-depends-on (:trivial-features)
   :components ((:file "package")
                (:file "common")
                (:file "fontconfig" :if-feature :linux)
@@ -22,6 +23,6 @@
                (:file "windows" :if-feature :win32)
                (:file "documentation"))
   :depends-on (:documentation-utils
-               :trivial-features
                :trivial-indent
+               (:feature :windows :com-on)
                :cffi))
