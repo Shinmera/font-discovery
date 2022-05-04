@@ -14,7 +14,6 @@
 (cffi:defctype word :uint16)
 (cffi:defctype dword :uint32)
 (cffi:defctype ulong :unsigned-long)
-(cffi:defctype refiid :pointer)
 (cffi:defctype wchar :uint16)
 
 (com:define-guid IID-IDWriteFactory
@@ -91,7 +90,7 @@
 
 (cffi:defcfun (create-factory "DWriteCreateFactory") com:hresult
   (type factory-type)
-  (iid refiid)
+  (iid com:guid)
   (factory :pointer))
 
 (com:define-comstruct dwrite-factory

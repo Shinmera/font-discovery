@@ -9,10 +9,6 @@
 (defvar *factory*)
 (defvar *collection*)
 
-(defun check-result (form)
-  (unless (= 0 (ldb (byte 1 31) form))
-    (error "Windows API call failed.")))
-
 (defun init ()
   (unless (boundp '*factory*)
     (com:init)
@@ -37,7 +33,7 @@
 
 (defmacro with-getter-value ((var getter) &body body)
   `(cffi:with-foreign-object (,var :pointer)
-     (check-result ,getter)
+     (com:check-hresult ,getter)
      (let ((,var (cffi:mem-ref ,var :pointer)))
        (with-protection (com:release ,var)
          ,@body))))
@@ -59,16 +55,16 @@
         ((face (dwrite-font-create-font-face font face))
          (file (dwrite-font-face-get-files face count file))
          (loader (dwrite-font-file-get-loader file loader)))
-      (check-result
+      (com:check-hresult
        (dwrite-font-file-get-reference-key file key size))
-      (check-result
+      (com:check-hresult
        (dwrite-local-font-file-loader-get-file-path-length-from-key
         loader
         (cffi:mem-ref key :pointer)
         (cffi:mem-ref size :uint32)
         length))
       (cffi:with-foreign-object (path 'wchar (1+ (cffi:mem-ref length :uint32)))
-        (check-result
+        (com:check-hresult
          (dwrite-local-font-file-loader-get-file-path-from-key
           loader
           (cffi:mem-ref key :pointer)
@@ -83,15 +79,15 @@
                                 (length :uint32)
                                 (exists :bool))
       (com:with-wstring (locale "en-us")
-        (check-result
+        (com:check-hresult
          (dwrite-localized-strings-find-locale-name names locale index exists)))
       (let ((index (if (cffi:mem-ref exists :bool)
                        (cffi:mem-ref index :uint32)
                        0)))
-        (check-result
+        (com:check-hresult
          (dwrite-localized-strings-get-string-length names index length))
         (cffi:with-foreign-object (string 'wchar (1+ (cffi:mem-ref length :uint32)))
-          (check-result
+          (com:check-hresult
            (dwrite-localized-strings-get-string names index string (1+ (cffi:mem-ref length :uint32))))
           (com:wstring->string string))))))
 
@@ -110,7 +106,7 @@
          (cffi:with-foreign-objects ((index :uint32)
                                      (exists :bool))
            (com:with-wstring (family family)
-             (check-result
+             (com:check-hresult
               (dwrite-font-collection-find-family-name *collection* family index exists)))
            (when (cffi:mem-ref exists :bool)
              (with-getter-values
@@ -151,7 +147,7 @@
              (cffi:with-foreign-objects ((index :uint32)
                                          (exists :bool))
                (com:with-wstring (family family)
-                 (check-result
+                 (com:check-hresult
                   (dwrite-font-collection-find-family-name *collection* family index exists)))
                (when (cffi:mem-ref exists :bool)
                  (handle-family (cffi:mem-ref index :uint32)))))
