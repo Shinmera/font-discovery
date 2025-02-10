@@ -3,6 +3,11 @@
 (cffi:define-foreign-library directwrite
   (T "Dwrite.dll"))
 
+(set 'cl-user::*foreign-system-libraries*
+     (union (when (boundp 'cl-user::*foreign-system-libraries*)
+              (symbol-value 'cl-user::*foreign-system-libraries*))
+            '(directwrite)))
+
 ;; https://github.com/Alexpux/mingw-w64/blob/master/mingw-w64-headers/include/dwrite.h
 
 (cffi:defctype word :uint16)

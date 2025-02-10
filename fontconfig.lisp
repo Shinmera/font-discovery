@@ -3,6 +3,11 @@
 (cffi:define-foreign-library fontconfig
   (T (:or "libfontconfig.so.1" "libfontconfig.so")))
 
+(set 'cl-user::*foreign-system-libraries*
+     (union (when (boundp 'cl-user::*foreign-system-libraries*)
+              (symbol-value 'cl-user::*foreign-system-libraries*))
+            '(fontconfig)))
+
 (defvar +FAMILY+ "family")              ; String
 (defvar +FILE+ "file")                  ; String
 (defvar +SLANT+ "slant")                ; Int

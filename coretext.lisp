@@ -6,6 +6,11 @@
 (cffi:define-foreign-library coretext
   (T (:framework "CoreText")))
 
+(set 'cl-user::*foreign-system-libraries*
+     (union (when (boundp 'cl-user::*foreign-system-libraries*)
+              (symbol-value 'cl-user::*foreign-system-libraries*))
+            '(foundation coretext)))
+
 (cffi:defctype cgfloat :double)
 (cffi:defctype cfindex :long)
 
