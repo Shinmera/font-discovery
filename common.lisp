@@ -30,11 +30,7 @@
   `(unwind-protect (progn ,@protected) ,unwind))
 
 (defun parse-file (string)
-  #+ccl (ccl:native-to-pathname string)
-  #+cmucl (uiop/os::parse-unix-namestring* string)
-  #+sbcl (sb-ext:parse-native-namestring string)
-  #+scl (lisp::parse-unix-namestring)
-  #-(or ccl cmucl sbcl scl) (parse-namestring string))
+  (pathname-utils:parse-native-namestring string))
 
 (defgeneric init* (backend))
 (defgeneric refresh* (backend))

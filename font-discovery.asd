@@ -9,6 +9,7 @@
   :defsystem-depends-on (:trivial-features)
   :components ((:file "package")
                (:file "common")
+               (:file "generic")
                (:file "fontconfig" :if-feature (:or :linux :bsd))
                (:file "linux" :if-feature (:or :linux :bsd))
                (:file "coretext" :if-feature :darwin)
@@ -17,6 +18,8 @@
                (:file "windows" :if-feature :win32)
                (:file "documentation"))
   :depends-on (:documentation-utils
+               :pathname-utils
                :trivial-indent
+               :zpb-ttf
                (:feature :windows :com-on)
                :cffi))
