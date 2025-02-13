@@ -1,20 +1,21 @@
 (in-package #:org.shirakumo.font-discovery)
 
 (defvar *font-search-paths*
-  (remove NIL
-          (list 
-           #+(and unix (not darwin)) #p"/usr/share/fonts/"
-           #+(and unix (not darwin)) #p"/usr/local/share/fonts/"
-           #+(and unix (not darwin)) #p"~/.local/share/fonts/"
-           #+(and unix (not darwin)) #p"~/.fonts/"
-           #+(and unix (not darwin)) (let ((path (pathname-utils::getenv "XDG_DATA_HOME")))
-                                       (when (and path (string/= "" path))
-                                         (pathname-utils:parse-native-namestring path)))
-           #+darwin #p"/System/Library/Fonts/"
-           #+darwin #p"/Library/Fonts/"
-           #+darwin #p"~/Library/Fonts/"
-           #+windows #p"%WINDIR%/Fonts"
-           #+windows #p"%USERPROFILE%/AppData/Local/Microsoft/Windows/Fonts")))
+  (delete-duplicates
+   (mapcar #'pathname-utils:parse-native-namestring
+           (remove NIL
+                   (list
+                    #+(and unix (not darwin)) "/usr/share/fonts/"
+                    #+(and unix (not darwin)) "/usr/local/share/fonts/"
+                    #+(and unix (not darwin)) "~/.local/share/fonts/"
+                    #+(and unix (not darwin)) "~/.fonts/"
+                    #+(and unix (not darwin)) (let ((path (pathname-utils::getenv "XDG_DATA_HOME")))
+                                                (when (and path (string/= "" path)) path))
+                    #+darwin "/System/Library/Fonts/"
+                    #+darwin "/Library/Fonts/"
+                    #+darwin "~/Library/Fonts/"
+                    #+windows "%WINDIR%/Fonts"
+                    #+windows "%USERPROFILE%/AppData/Local/Microsoft/Windows/Fonts")))))
 
 (defclass generic (backend)
   ((registry :initform NIL :accessor registry)))
@@ -76,6 +77,7 @@
 (defun discover-fonts (dir &optional (fonts (make-array 0 :adjustable T :fill-pointer T)))
   (dolist (file (directory (make-pathname :name pathname-utils:*wild-component* :type "ttf" :defaults dir)))
     (handler-case
+        ;; TODO: eliminate duplicate fonts
         (zpb-ttf:with-font-loader (font file)
           (vector-push-extend
            (make-instance 'font
