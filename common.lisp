@@ -1,5 +1,10 @@
 (in-package #:org.shirakumo.font-discovery)
 
+(defvar *backends* ())
+
+(defclass backend ()
+  ())
+
 (defclass font ()
   ((file :initarg :file :initform (error "FILE required.") :reader file)
    (family :initarg :family :initform (error "FAMILY required.") :reader family)
@@ -30,3 +35,37 @@
   #+sbcl (sb-ext:parse-native-namestring string)
   #+scl (lisp::parse-unix-namestring)
   #-(or ccl cmucl sbcl scl) (parse-namestring string))
+
+(defgeneric init* (backend))
+(defgeneric refresh* (backend))
+(defgeneric deinit* (backend))
+(defgeneric find-font* (backend &key family slant weight spacing stretch))
+(defgeneric list-fonts* (backend &key family slant weight spacing stretch))
+
+(defun register-backend (type)
+  (or (find type *backends* :key #'type-of)
+      (let ((backend (make-instance type)))
+        (push backend *backends*)
+        backend)))
+
+(defun init ()
+  (mapc #'init* *backends*))
+
+(defun refresh ()
+  (init)
+  (mapc #'refresh *backends*))
+
+(defun deinit ()
+  (mapc #'deinit* *backends*))
+
+(defun find-font (&rest args &key family slant weight spacing stretch)
+  (declare (ignore family slant weight spacing stretch))
+  (init)
+  (loop for backend in *backends*
+        thereis (apply #'find-font* backend args)))
+
+(defun list-fonts (&rest args &key family slant weight spacing stretch)
+  (declare (ignore family slant weight spacing stretch))
+  (init)
+  (loop for backend in *backends*
+        nconc (apply #'list-fonts args)))

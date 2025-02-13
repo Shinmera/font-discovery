@@ -1,29 +1,35 @@
 (in-package #:org.shirakumo.font-discovery)
 
-(defvar *factory*)
-(defvar *collection*)
+(defclass directwrite (backend)
+  ((factory :initform NIL :accessor factory)
+   (collection :initform NIL :accessor collection)))
 
-(defun init ()
-  (unless (boundp '*factory*)
-    (com:init)
-    (cffi:use-foreign-library directwrite)
-    (setf *factory* (com:with-deref (factory :pointer) (create-factory :shared IID-IDWriteFactory factory)))
-    (refresh)))
+(register-backend 'directwrite)
 
-(defun refresh ()
-  (init)
-  (when (boundp '*collection*)
-    (com:release *collection*))
-  (setf *collection* (com:with-deref (collection :pointer) (dwrite-factory-get-system-font-collection *factory* collection T)))
+(defmethod init* ((backend directwrite))
+  (com:init)
+  (unless (cffi:foreign-library-loaded-p 'directwrite)
+    (cffi:load-foreign-library 'directwrite))
+  (unless (factory backend)
+    (setf (factory backend) (com:with-deref (factory :pointer)
+                              (create-factory :shared IID-IDWriteFactory factory)))
+    (refresh))
   T)
 
-(defun deinit ()
-  (when (boundp '*factory*)
-    (com:release *collection*)
-    (makunbound '*collection*)
-    (com:release *factory*)
-    (makunbound '*factory*)
-    T))
+(defmethod refresh* ((backend directwrite))
+  (when (collection backend)
+    (com:release (collection backend)))
+  (setf (collection backend) (com:with-deref (collection :pointer)
+                               (dwrite-factory-get-system-font-collection (factory backend) collection T)))
+  T)
+
+(defmethod deinit* ((backend directwrite))
+  (when (collection backend)
+    (com:release (collection backend))
+    (setf (collection backend) NIL))
+  (when (factory backend)
+    (com:release (factory backend))
+    (setf (factory backend) NIL)))
 
 (defmacro with-getter-value ((var getter) &body body)
   `(cffi:with-foreign-object (,var :pointer)
@@ -93,19 +99,18 @@
                  :weight (maybe-enum-val 'weight (dwrite-font-get-weight font))
                  :stretch (maybe-enum-val 'stretch (dwrite-font-get-stretch font))))
 
-(defun find-font (&rest args &key family slant weight spacing stretch)
+(defmethod find-font* ((backend directwrite) &rest args &key family slant weight spacing stretch)
   (declare (ignore spacing))
-  (init)
   (cond (family
          (cffi:with-foreign-objects ((index :uint32)
                                      (exists :bool))
            (com:with-wstring (family family)
              (com:check-hresult
-              (dwrite-font-collection-find-family-name *collection* family index exists)))
+              (dwrite-font-collection-find-family-name (collection backend) family index exists)))
            (when (cffi:mem-ref exists :bool)
              (with-getter-values
                  ((family (dwrite-font-collection-get-font-family
-                           *collection*
+                           (collection backend)
                            (cffi:mem-ref index :uint32)
                            family))
                   (font (dwrite-font-family-get-first-matching-font
@@ -118,14 +123,13 @@
         (T
          (first (apply #'list-fonts args)))))
 
-(defun list-fonts (&key family slant weight spacing stretch)
+(defmethod list-fonts* ((backend directwrite) &key family slant weight spacing stretch)
   (declare (ignore spacing))
-  (init)
   (let ((fonts ()))
     (flet ((handle-family (index)
              (with-getter-values
                  ((family (dwrite-font-collection-get-font-family
-                           *collection*
+                           (collection backend)
                            index
                            family))
                   (list (dwrite-font-family-get-matching-fonts
@@ -142,11 +146,11 @@
                                          (exists :bool))
                (com:with-wstring (family family)
                  (com:check-hresult
-                  (dwrite-font-collection-find-family-name *collection* family index exists)))
+                  (dwrite-font-collection-find-family-name (collection backend) family index exists)))
                (when (cffi:mem-ref exists :bool)
                  (handle-family (cffi:mem-ref index :uint32)))))
             (T
-             (loop for i from 0 below (dwrite-font-collection-get-font-family-count *collection*)
+             (loop for i from 0 below (dwrite-font-collection-get-font-family-count (collection backend))
                    do (handle-family i))
              ;; FIXME: reorder collected list by proximity to requested properties.
              )))

@@ -1,19 +1,20 @@
 (in-package #:org.shirakumo.font-discovery)
 
-(defvar *init* NIL)
+(defclass coretext (backend)
+  ())
 
-(defun init ()
-  (unless *init*
-    (cffi:use-foreign-library foundation)
-    (cffi:use-foreign-library coretext)
-    (setf *init* T)))
+(register-backend 'coretext)
 
-(defun refresh ())
+(defmethod init* ((backend coretext))
+  (unless (cffi:foreign-library-loaded-p 'foundation)
+    (cffi:load-foreign-library 'foundation))
+  (unless (cffi:foreign-library-loaded-p 'coretext)
+    (cffi:load-foreign-library 'coretext))
+  T)
 
-(defun deinit ()
-  (when *init*
-    (setf *init* NIL)
-    T))
+(defmethod refresh* ((backend coretext)) T)
+
+(defmethod deinit* ((backend coretext)) T)
 
 (defun translate-value (value table)
   (etypecase value
@@ -151,9 +152,7 @@
                            :stretch (with-trait (stretch width-trait)
                                       (translate-stretch (number-value stretch :double)))))))
 
-(defun find-font (&rest args &key family slant weight spacing stretch)
-  (declare (ignore family slant weight spacing stretch))
-  (init)
+(defmethod find-font* ((backend coretext) &rest args &key &allow-other-keys)
   (with-attributes (attributes mandatory args)
     (with-foundation-object (descriptor (create-font-descriptor attributes))
       (let ((normalized (font-descriptor-create-matching-font-descriptor descriptor mandatory)))
@@ -162,9 +161,7 @@
                              (release normalized))
             (translate-descriptor normalized)))))))
 
-(defun list-fonts (&rest args &key family slant weight spacing stretch)
-  (declare (ignore family slant weight spacing stretch))
-  (init)
+(defmethod list-fonts* ((backend coretext) &rest args &key &allow-other-keys)
   (with-attributes (attributes mandatory args)
     (with-foundation-object (descriptor (create-font-descriptor attributes))
       (with-foundation-object (array (font-descriptor-create-matching-font-descriptors descriptor mandatory) NIL)
