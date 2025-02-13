@@ -27,9 +27,10 @@
   T)
 
 (defmethod refresh* ((backend generic))
-  (setf (registry backend)
-        (loop for dir in *font-search-paths*
-              nconc (discover-fonts dir)))
+  (let ((fonts (make-array 0 :adjustable T :fill-pointer T)))
+    (loop for dir in *font-search-paths*
+          do (discover-fonts dir fonts))
+    (setf (registry backend) fonts))
   T)
 
 (defmethod deinit* ((backend generic))
@@ -74,18 +75,19 @@
 
 (defun discover-fonts (dir &optional (fonts (make-array 0 :adjustable T :fill-pointer T)))
   (dolist (file (directory (make-pathname :name pathname-utils:*wild-component* :type "ttf" :defaults dir)))
-    (ignore-errors
-     (zpb-ttf:with-font-loader (font file)
-       (vector-push-extend
-        (make-instance 'font
-                       :file file
-                       :family (zpb-ttf:family-name font)
-                       :slant ()
-                       :weight ()
-                       :stretch ()
-                       :spacing (if (zpb-ttf:fixed-pitch-p font)
-                                    :monospace
-                                    :proportional))
-        fonts))))
-  (dolist (dirs (directory (merge-pathnames pathname-utils:*wild-directory* dir)) fonts)
+    (handler-case
+        (zpb-ttf:with-font-loader (font file)
+          (vector-push-extend
+           (make-instance 'font
+                          :file file
+                          :family (zpb-ttf:family-name font)
+                          :slant ()
+                          :weight ()
+                          :stretch ()
+                          :spacing (if (zpb-ttf:fixed-pitch-p font)
+                                       :monospace
+                                       :proportional))
+           fonts))
+      (condition ())))
+  (dolist (dir (directory (merge-pathnames pathname-utils:*wild-directory* dir)) fonts)
     (discover-fonts dir fonts)))
