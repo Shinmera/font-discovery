@@ -87,10 +87,8 @@ stretch factor.
  :EXTRA-EXPANDED
  :ULTRA-EXPANDED
 
-See FONT"))
+See FONT")
 
-;; interface
-(docs:define-docs
   (function init
     "Initializes the library for use.
 
@@ -154,3 +152,32 @@ Doing this will automatically call INIT.
 See FIND-FONT
 See INIT
 See FONT"))
+
+;; generic
+(docs:define-docs
+  (variable *font-search-paths*
+    "List of directories to search for fonts in the generic backend.
+
+The default list depends on the operating system as follows:
+
+On Linux/BSD:
+  /usr/share/fonts/
+  /usr/local/share/fonts/
+  ~/.local/share/fonts/
+  ~/.fonts/
+  $XDG_DATA_HOME/fonts/
+
+On Darwin:
+  /System/Library/Fonts/
+  /Library/Fonts/
+  ~/Library/Fonts/
+
+On Windows:
+  %WINDIR%/Fonts/
+  %USERPROFILE%/AppData/Local/Microsoft/Windows/Fonts/
+
+Users may push additional directories to search onto this list.
+After modifying the list, REFRESH must be called to rediscover
+the fonts.
+
+See REFRESH"))
