@@ -155,8 +155,8 @@ See FONT"))
 
 ;; generic
 (docs:define-docs
-  (variable *font-search-paths*
-    "List of directories to search for fonts in the generic backend.
+  (variable *system-font-search-paths*
+    "List of standard system font directories.
 
 The default list depends on the operating system as follows:
 
@@ -176,8 +176,14 @@ On Windows:
   %WINDIR%/Fonts/
   %USERPROFILE%/AppData/Local/Microsoft/Windows/Fonts/
 
+See *FONT-SEARCH-PATHS*")
+  
+  (variable *font-search-paths*
+    "List of directories to search for fonts in the generic backend.
+
 Users may push additional directories to search onto this list.
 After modifying the list, REFRESH must be called to rediscover
 the fonts.
 
+See *SYSTEM-FONT-SEARCH-PATHS*
 See REFRESH"))

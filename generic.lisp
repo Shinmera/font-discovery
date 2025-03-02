@@ -1,6 +1,6 @@
 (in-package #:org.shirakumo.font-discovery)
 
-(defvar *font-search-paths*
+(defvar *system-font-search-paths*
   (delete-duplicates
    (mapcar #'pathname-utils:parse-native-namestring
            (remove NIL
@@ -17,6 +17,8 @@
                     #+darwin "~/Library/Fonts/"
                     #+windows "%WINDIR%/Fonts/"
                     #+windows "%USERPROFILE%/AppData/Local/Microsoft/Windows/Fonts/")))))
+
+(defvar *font-search-paths* ())
 
 (defclass generic (backend)
   ((registry :initform NIL :accessor registry)))

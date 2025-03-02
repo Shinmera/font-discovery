@@ -14,4 +14,6 @@
    #:refresh
    #:deinit
    #:find-font
-   #:list-fonts))
+   #:list-fonts
+   #:*system-font-search-paths*
+   #:*font-search-paths*))
