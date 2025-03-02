@@ -10,12 +10,13 @@
                     #+(and unix (not darwin)) "~/.local/share/fonts/"
                     #+(and unix (not darwin)) "~/.fonts/"
                     #+(and unix (not darwin)) (let ((path (pathname-utils::getenv "XDG_DATA_HOME")))
-                                                (when (and path (string/= "" path)) path))
+                                                (when (and path (string/= "" path))
+                                                  (format NIL "~a/fonts/" path)))
                     #+darwin "/System/Library/Fonts/"
                     #+darwin "/Library/Fonts/"
                     #+darwin "~/Library/Fonts/"
-                    #+windows "%WINDIR%/Fonts"
-                    #+windows "%USERPROFILE%/AppData/Local/Microsoft/Windows/Fonts")))))
+                    #+windows "%WINDIR%/Fonts/"
+                    #+windows "%USERPROFILE%/AppData/Local/Microsoft/Windows/Fonts/")))))
 
 (defclass generic (backend)
   ((registry :initform NIL :accessor registry)))
