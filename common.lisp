@@ -64,4 +64,4 @@
   (declare (ignore family slant weight spacing stretch))
   (init)
   (loop for backend in *backends*
-        nconc (apply #'list-fonts args)))
+        nconc (apply #'list-fonts* backend args)))
