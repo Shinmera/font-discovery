@@ -49,7 +49,7 @@
 
 (defun refresh ()
   (init)
-  (mapc #'refresh *backends*))
+  (mapc #'refresh* *backends*))
 
 (defun deinit ()
   (mapc #'deinit* *backends*))
