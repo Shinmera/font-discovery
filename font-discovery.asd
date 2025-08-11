@@ -4,7 +4,7 @@
   :author "Yukari Hafner <shinmera@tymoon.eu>"
   :maintainer "Yukari Hafner <shinmera@tymoon.eu>"
   :description "Find system font files matching a font spec."
-  :homepage "https://github.com/Shinmera/font-discovery"
+  :homepage "https://shinmera.com/project/font-discovery"
   :serial T
   :defsystem-depends-on (:trivial-features)
   :components ((:file "package")
